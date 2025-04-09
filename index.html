@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Quét mã QR bằng camera</title>
+  <title>Quét mã QR bằng camera sau</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
@@ -24,26 +24,38 @@
   </style>
 </head>
 <body>
-  <h1>📷 Quét mã QR</h1>
+  <h1>📷 Quét mã QR (Camera sau)</h1>
   <div id="reader"></div>
-  <div id="result">Đang quét...</div>
+  <div id="result">Đang khởi động camera...</div>
 
   <script>
-    function onScanSuccess(decodedText, decodedResult) {
-      document.getElementById('result').innerText = `✅ Kết quả: ${decodedText}`;
-      html5QrcodeScanner.clear(); // Dừng quét sau khi thành công
-    }
+    const html5QrCode = new Html5Qrcode("reader");
 
-    function onScanFailure(error) {
-      // console.warn(`Lỗi: ${error}`);
-    }
-
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader",
-      { fps: 10, qrbox: 250 },
-      false
-    );
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    Html5Qrcode.getCameras().then(cameras => {
+      if (cameras && cameras.length) {
+        // Thử tìm camera sau
+        let backCamera = cameras.find(cam => cam.label.toLowerCase().includes('back')) || cameras[0];
+        
+        html5QrCode.start(
+          { deviceId: { exact: backCamera.id } },
+          {
+            fps: 10,
+            qrbox: 250
+          },
+          qrCodeMessage => {
+            document.getElementById('result').innerText = "✅ Kết quả: " + qrCodeMessage;
+            html5QrCode.stop();
+          },
+          errorMessage => {
+            // console.log(`Lỗi: ${errorMessage}`);
+          }
+        ).catch(err => {
+          document.getElementById('result').innerText = "❌ Không thể mở camera: " + err;
+        });
+      }
+    }).catch(err => {
+      document.getElementById('result').innerText = "❌ Không tìm thấy camera nào: " + err;
+    });
   </script>
 </body>
 </html>
