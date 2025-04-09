@@ -1,37 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR Code Scanner</title>
-  <script src="https://unpkg.com/qr-scanner/qr-scanner.min.js"></script>
+  <title>Quét mã QR</title>
   <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
     video {
       width: 100%;
       max-width: 500px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
     }
     #result {
       margin-top: 20px;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       color: green;
     }
   </style>
 </head>
 <body>
-  <h1>Quét mã QR</h1>
-  <video id="video" playsinline autoplay></video>
+  <h1>📷 Quét mã QR</h1>
+  <video id="video" playsinline autoplay muted></video>
   <div id="result">Đang quét...</div>
 
-  <script type="module">
-    import QrScanner from "./qr-scanner.min.js";
-    QrScanner.WORKER_PATH = './qr-scanner-worker.min.js';
-
+  <script src="https://unpkg.com/qr-scanner/qr-scanner.min.js"></script>
+  <script>
     const video = document.getElementById('video');
     const resultEl = document.getElementById('result');
 
     const scanner = new QrScanner(video, result => {
-      resultEl.textContent = 'Kết quả: ' + result;
-      scanner.stop();
+      resultEl.textContent = '✅ Kết quả: ' + result;
+      scanner.stop(); // Dừng sau khi quét xong
     });
 
     scanner.start();
