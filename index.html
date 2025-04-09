@@ -1,44 +1,49 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quét mã QR</title>
+  <meta charset="UTF-8">
+  <title>Quét mã QR bằng camera</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
       padding: 20px;
     }
-    video {
+    #reader {
       width: 100%;
-      max-width: 500px;
-      border: 2px solid #ccc;
-      border-radius: 10px;
+      max-width: 400px;
+      margin: auto;
     }
     #result {
       margin-top: 20px;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       color: green;
     }
   </style>
 </head>
 <body>
   <h1>📷 Quét mã QR</h1>
-  <video id="video" playsinline autoplay muted></video>
+  <div id="reader"></div>
   <div id="result">Đang quét...</div>
 
-  <script src="https://unpkg.com/qr-scanner/qr-scanner.min.js"></script>
   <script>
-    const video = document.getElementById('video');
-    const resultEl = document.getElementById('result');
+    function onScanSuccess(decodedText, decodedResult) {
+      document.getElementById('result').innerText = `✅ Kết quả: ${decodedText}`;
+      html5QrcodeScanner.clear(); // Dừng quét sau khi thành công
+    }
 
-    const scanner = new QrScanner(video, result => {
-      resultEl.textContent = '✅ Kết quả: ' + result;
-      scanner.stop(); // Dừng sau khi quét xong
-    });
+    function onScanFailure(error) {
+      // console.warn(`Lỗi: ${error}`);
+    }
 
-    scanner.start();
+    const html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader",
+      { fps: 10, qrbox: 250 },
+      false
+    );
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
   </script>
 </body>
 </html>
