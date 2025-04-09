@@ -1,1 +1,40 @@
-<h1>helloo</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Code Scanner</title>
+  <script src="https://unpkg.com/qr-scanner/qr-scanner.min.js"></script>
+  <style>
+    video {
+      width: 100%;
+      max-width: 500px;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quét mã QR</h1>
+  <video id="video" playsinline autoplay></video>
+  <div id="result">Đang quét...</div>
+
+  <script type="module">
+    import QrScanner from "./qr-scanner.min.js";
+    QrScanner.WORKER_PATH = './qr-scanner-worker.min.js';
+
+    const video = document.getElementById('video');
+    const resultEl = document.getElementById('result');
+
+    const scanner = new QrScanner(video, result => {
+      resultEl.textContent = 'Kết quả: ' + result;
+      scanner.stop();
+    });
+
+    scanner.start();
+  </script>
+</body>
+</html>
