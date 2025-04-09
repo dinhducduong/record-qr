@@ -31,30 +31,21 @@
   <script>
     const html5QrCode = new Html5Qrcode("reader");
 
-    Html5Qrcode.getCameras().then(cameras => {
-      if (cameras && cameras.length) {
-        // Thử tìm camera sau
-        let backCamera = cameras.find(cam => cam.label.toLowerCase().includes('back')) || cameras[0];
-        
-        html5QrCode.start(
-          { deviceId: { exact: backCamera.id } },
-          {
-            fps: 10,
-            qrbox: 250
-          },
-          qrCodeMessage => {
-            document.getElementById('result').innerText = "✅ Kết quả: " + qrCodeMessage;
-            html5QrCode.stop();
-          },
-          errorMessage => {
-            // console.log(`Lỗi: ${errorMessage}`);
-          }
-        ).catch(err => {
-          document.getElementById('result').innerText = "❌ Không thể mở camera: " + err;
-        });
+    html5QrCode.start(
+      { facingMode: "environment" }, // Chọn camera sau
+      {
+        fps: 10,
+        qrbox: 250
+      },
+      qrCodeMessage => {
+        document.getElementById('result').innerText = "✅ Kết quả: " + qrCodeMessage;
+        html5QrCode.stop();
+      },
+      errorMessage => {
+        // console.log("Lỗi khi quét:", errorMessage);
       }
-    }).catch(err => {
-      document.getElementById('result').innerText = "❌ Không tìm thấy camera nào: " + err;
+    ).catch(err => {
+      document.getElementById('result').innerText = "❌ Không thể mở camera: " + err;
     });
   </script>
 </body>
