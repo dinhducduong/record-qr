@@ -14,38 +14,80 @@
     #reader {
       width: 100%;
       max-width: 400px;
-      margin: auto;
+      margin: 20px auto;
+      display: none;
     }
     #result {
       margin-top: 20px;
       font-size: 1.2rem;
       color: green;
     }
+    #start-btn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #start-btn:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
   <h1>📷 Quét mã QR (Camera sau)</h1>
+
+  <button id="start-btn">Bắt đầu quét mã</button>
+
   <div id="reader"></div>
-  <div id="result">Đang khởi động camera...</div>
+  <div id="result"></div>
+
+  <!-- Âm thanh -->
+  <audio id="beep-sound" src="./public/beep.mp3"></audio>
+  <audio id="start-sound" src="./public/bat-dau-dong-hang.mp3"></audio>
 
   <script>
     const html5QrCode = new Html5Qrcode("reader");
+    const startButton = document.getElementById("start-btn");
+    const resultContainer = document.getElementById("result");
 
-    html5QrCode.start(
-      { facingMode: "environment" }, // Chọn camera sau
-      {
-        fps: 10,
-        qrbox: 250
-      },
-      qrCodeMessage => {
-        document.getElementById('result').innerText = "✅ Kết quả: " + qrCodeMessage;
-        html5QrCode.stop();
-      },
-      errorMessage => {
-        // console.log("Lỗi khi quét:", errorMessage);
-      }
-    ).catch(err => {
-      document.getElementById('result').innerText = "❌ Không thể mở camera: " + err;
+    const beepSound = document.getElementById("beep-sound");
+    const startSound = document.getElementById("start-sound");
+
+    let hasScanned = false;
+
+    startButton.addEventListener("click", () => {
+      startButton.style.display = "none";
+      document.getElementById("reader").style.display = "block";
+      resultContainer.innerText = "📡 Đang quét...";
+
+      html5QrCode.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: 250
+        },
+        qrCodeMessage => {
+          if (hasScanned) return;
+          hasScanned = true;
+
+          resultContainer.innerText = "✅ Quét thành công: " + qrCodeMessage;
+          beepSound.play(); // phát tiếng "tít"
+
+          setTimeout(() => {
+            startSound.play(); // phát "Bắt đầu đóng hàng"
+          }, 1000);
+
+          html5QrCode.stop();
+        },
+        errorMessage => {
+          // Bỏ qua lỗi nhỏ khi chưa quét được
+        }
+      ).catch(err => {
+        resultContainer.innerText = "❌ Không thể mở camera: " + err;
+      });
     });
   </script>
 </body>
